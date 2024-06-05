@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-abstract class Instruction {
+sealed abstract class Instruction permits LoadConstant, Decrement, Multiply, JumpIfZero, Jump, Halt {
 	
 	abstract void execute(Machine machine);
 }
 
-class LoadConstant extends Instruction {
+final class LoadConstant extends Instruction {
 	int r;
 	int c;
 	
@@ -24,7 +24,7 @@ class LoadConstant extends Instruction {
 	}
 }
 
-class JumpIfZero extends Instruction {
+final class JumpIfZero extends Instruction {
 	int r;
 	int a;
 	
@@ -41,7 +41,7 @@ class JumpIfZero extends Instruction {
 	}
 }
 
-class Jump extends Instruction {
+final class Jump extends Instruction {
 	int a;
 	
 	Jump(int a) {
@@ -53,14 +53,14 @@ class Jump extends Instruction {
 	}
 }
 
-class Halt extends Instruction{
+final class Halt extends Instruction{
 
 	void execute(Machine machine) {
 		machine.pc = -1;
 	}
 }
 
-class Multiply extends Instruction {
+final class Multiply extends Instruction {
 	int r1;
 	int r2;
 	
@@ -75,7 +75,7 @@ class Multiply extends Instruction {
 	}
 }
 
-class Decrement extends Instruction {
+final class Decrement extends Instruction {
 	int r;
 	
 	Decrement(int r) {
@@ -88,14 +88,6 @@ class Decrement extends Instruction {
 	}
 }
 
-class Divide extends Instruction {
-	int r1, r2;
-	
-	void execute(Machine machine) {
-		machine.registers[r1] /= machine.registers[r2];
-	}
-}
-
 class Machine {
 	
 	int pc;
@@ -105,7 +97,15 @@ class Machine {
 		this.registers = registers;
 		while (0 <= pc) {
 			Instruction instruction = instructions[pc];
-			instruction.execute(this);
+			switch (instruction) {
+			case LoadConstant l -> { registers[l.r] = l.c; }
+			case Multiply m -> { registers[m.r1] *= registers[m.r2]; }
+			case Decrement d -> { registers[d.r]--; }
+			case JumpIfZero j -> { if (registers[j.r] == 0) pc = j.a; else pc++; }
+			case Jump j -> { pc = j.a; }
+			case Halt h -> { pc = -1; }
+			// default -> throw new AssertionError();
+			}
 		}
 	}
 	
