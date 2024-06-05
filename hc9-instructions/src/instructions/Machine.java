@@ -109,6 +109,16 @@ class Machine {
 		}
 	}
 	
+	int getCost(Instruction i) {
+		return switch (i) {
+		case LoadConstant c -> 1;
+		case Multiply m -> 4;
+		case JumpIfZero j -> 1;
+		case Jump j -> 1;
+		case Decrement d -> 1;
+		case Halt h -> 1;
+		};
+	}
 }
 
 class MachineTest {
