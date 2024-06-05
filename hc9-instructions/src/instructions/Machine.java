@@ -4,6 +4,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+enum TennisPlayerScore { 
+	LOVE(0), 
+	FIFTEEN(15), 
+	THIRTY(30), 
+	FORTY(40);
+	
+	int value;
+	
+	TennisPlayerScore(int value) { this.value = value; }
+	
+	static String toString(TennisPlayerScore score) {
+		return switch (score) {
+		case LOVE -> "love";
+		case FIFTEEN -> "fifteen";
+		case THIRTY -> "thirty";
+		case FORTY -> "forty";
+		};
+	}
+}
+
 sealed abstract class Instruction permits LoadConstant, Decrement, Multiply, JumpIfZero, Jump, Halt {
 	
 	abstract void execute(Machine machine);
